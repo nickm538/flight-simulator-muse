@@ -262,7 +262,7 @@ async function boot() {
     // Sync 3D model
     aircraft.group.position.copy(fstate.pos);
     aircraft.group.quaternion.copy(fstate.quat);
-    aircraft.update(dt, fstate, controls);
+    aircraft.parts.update(dt, fstate, controls);
 
     cockpit.update(dt, fstate, controls);
     scenery.update(dt, { timeOfDay: game.timeOfDay, wind: env.wind });
