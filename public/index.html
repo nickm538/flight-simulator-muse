@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Muse Flight Simulator — Southwest 737 NYC</title>
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three.module.js"
+  }
+}
+</script>
+</head>
+<body>
+<canvas id="scene"></canvas>
+
+<!-- Loading screen -->
+<div id="loading" class="overlay">
+  <div class="load-box">
+    <div class="logo">✈ <span>Muse Flight Simulator</span></div>
+    <div class="subtitle">Southwest Boeing 737-800 &middot; New York Metro</div>
+    <div class="progress"><div id="loadbar"></div></div>
+    <div id="loadlabel">Initializing…</div>
+  </div>
+</div>
+
+<!-- Main menu -->
+<div id="menu" class="overlay hidden">
+  <div class="menu-box">
+    <div class="logo">✈ <span>Muse Flight Simulator</span></div>
+    <div class="subtitle">Southwest Boeing 737-800 &middot; New York Metro</div>
+    <div class="menu-grid">
+      <label>Departure airport
+        <select id="menu-airport">
+          <option value="KJFK">KJFK — Kennedy Intl</option>
+          <option value="KLGA">KLGA — LaGuardia</option>
+          <option value="KEWR">KEWR — Newark Liberty</option>
+          <option value="KTEB">KTEB — Teterboro</option>
+        </select>
+      </label>
+      <label>Start position
+        <select id="menu-start">
+          <option value="gate">Gate / parking</option>
+          <option value="runway">Runway (ready for takeoff)</option>
+          <option value="air">Airborne (5,000 ft, 10 nm out)</option>
+        </select>
+      </label>
+      <label>Time of day
+        <select id="menu-time">
+          <option value="day">Day</option>
+          <option value="dawn">Dawn</option>
+          <option value="dusk">Dusk</option>
+          <option value="night">Night</option>
+        </select>
+      </label>
+      <label>Weather
+        <select id="menu-weather">
+          <option value="live">Live (METAR)</option>
+          <option value="vfr">Clear / calm</option>
+          <option value="windy">Windy</option>
+          <option value="ifr">Low IFR</option>
+        </select>
+      </label>
+    </div>
+    <button id="fly-btn" class="primary">▶ &nbsp;Fly</button>
+    <div class="menu-foot">Keyboard: arrows/WASD yoke &middot; PgUp/PgDn throttle &middot; G gear &middot; F flaps &middot; B brakes &middot; V view &middot; A ATC &middot; P pause &middot; H help</div>
+  </div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="hud-left">
+    <div class="hud-row"><span>IAS</span><b id="hud-ias">0</b><span>kt</span></div>
+    <div class="hud-row"><span>ALT</span><b id="hud-alt">0</b><span>ft</span></div>
+    <div class="hud-row"><span>HDG</span><b id="hud-hdg">000</b><span>°</span></div>
+    <div class="hud-row"><span>VS</span><b id="hud-vs">0</b><span>fpm</span></div>
+  </div>
+  <div id="hud-right">
+    <div class="hud-row"><span>N1</span><b id="hud-n1">0</b><span>%</span></div>
+    <div class="hud-row"><span>FLAP</span><b id="hud-flap">0</b></div>
+    <div class="hud-row"><span>GEAR</span><b id="hud-gear">DN</b></div>
+    <div class="hud-row"><span>FUEL</span><b id="hud-fuel">0</b><span>kg</span></div>
+  </div>
+  <div id="hud-warn"></div>
+</div>
+
+<!-- ATC panel -->
+<div id="atc" class="hidden">
+  <div id="atc-log"></div>
+  <div id="atc-options"></div>
+  <button id="atc-toggle" title="ATC (A)">ATC</button>
+</div>
+
+<!-- Pause menu -->
+<div id="pause" class="overlay hidden">
+  <div class="menu-box">
+    <div class="logo">⏸ Paused</div>
+    <button id="resume-btn" class="primary">Resume</button>
+    <button id="quit-btn">Back to menu</button>
+    <div class="menu-foot"><button id="help-btn2" class="linklike">Controls help</button></div>
+  </div>
+</div>
+
+<!-- Help overlay -->
+<div id="help" class="overlay hidden">
+  <div class="menu-box wide">
+    <div class="logo">⌨ Controls</div>
+    <div class="help-grid">
+      <div><b>Pitch / Roll</b><span>↑ ↓ ← → or W A S D</span></div>
+      <div><b>Rudder</b><span>Q / E</span></div>
+      <div><b>Throttle</b><span>PgUp / PgDn (Shift = both)</span></div>
+      <div><b>Flaps</b><span>F extend · Shift+F retract</span></div>
+      <div><b>Gear</b><span>G</span></div>
+      <div><b>Brakes</b><span>B (hold)</span></div>
+      <div><b>Spoilers</b><span>/ &nbsp;(Shift+/ arm)</span></div>
+      <div><b>Views</b><span>V cycles cockpit/chase/tower/flyby</span></div>
+      <div><b>ATC</b><span>A opens radio menu</span></div>
+      <div><b>Autopilot</b><span>H hdg · Shift+H alt · T autothrottle</span></div>
+      <div><b>Pause</b><span>P or Esc</span></div>
+      <div><b>Gamepad</b><span>Standard: left stick yoke, triggers throttle</span></div>
+    </div>
+    <button id="help-close" class="primary">Close</button>
+  </div>
+</div>
+
+<!-- Touch controls (shown on touch devices) -->
+<div id="touch" class="hidden">
+  <div id="stick-zone"><div id="stick-base"><div id="stick"></div></div></div>
+  <div id="thr-zone"><div id="thr-track"><div id="thr-handle"></div></div><div id="thr-label">THR</div></div>
+  <div id="touch-btns">
+    <button data-act="gear">GEAR</button>
+    <button data-act="flaps+">FLP+</button>
+    <button data-act="flaps-">FLP−</button>
+    <button data-act="brake">BRK</button>
+    <button data-act="atc">ATC</button>
+    <button data-act="view">VIEW</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="err" class="hidden"></div>
+
+<script type="module" src="js/core/main.js"></script>
+</body>
+</html>

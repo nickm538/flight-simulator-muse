@@ -1,0 +1,31 @@
+{
+  "bbox": {
+    "lat_min": 40.3,
+    "lat_max": 41.1,
+    "lon_min": -74.5,
+    "lon_max": -73.5
+  },
+  "attribution": "Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community. Terrain: USGS 3DEP/GMTED2010/SRTM via AWS Terrain Tiles.",
+  "airports": {
+    "KJFK": {
+      "lat": 40.6413,
+      "lon": -73.7781,
+      "spanDeg": 0.02
+    },
+    "KLGA": {
+      "lat": 40.7769,
+      "lon": -73.874,
+      "spanDeg": 0.02
+    },
+    "KEWR": {
+      "lat": 40.6895,
+      "lon": -74.1745,
+      "spanDeg": 0.02
+    },
+    "KTEB": {
+      "lat": 40.8501,
+      "lon": -74.0608,
+      "spanDeg": 0.02
+    }
+  }
+}
