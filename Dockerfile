@@ -1,5 +1,5 @@
 FROM nginx:alpine
 COPY public/ /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-EXPOSE 8080
-CMD ["nginx", "-g", "daemon off;"]
+# Railway injects $PORT; render the nginx config at boot so we listen on it.
+CMD ["sh", "-c", "envsubst '$PORT' < /etc/nginx/conf.d/default.conf > /tmp/default.conf && nginx -c /tmp/default.conf -g 'daemon off;'"]
