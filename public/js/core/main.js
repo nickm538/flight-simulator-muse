@@ -122,7 +122,7 @@ async function boot() {
     fstate.massKg = AIRCRAFT.oewKg + fstate.fuelKg + 15000; // pax + cargo approx
     atc.setAirport(ap.icao, menuCfg.start);
     if (atc.setWeatherProvider) atc.setWeatherProvider(weather);
-    if (traffic) traffic.setHomeAirport(ap.icao);
+    if (traffic) { traffic.setHomeAirport(ap.icao); traffic.setUI(ui); }
   }
 
   function applyTimeOfDay(tod) {
